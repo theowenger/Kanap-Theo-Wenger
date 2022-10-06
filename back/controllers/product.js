@@ -90,3 +90,5 @@ exports.orderProducts = (req, res, next) => {
     }
   );
 };
+
+let salut = 'product.js controler'

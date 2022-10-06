@@ -8,3 +8,5 @@ router.get('/:id', productCtrl.getOneProduct);
 router.post('/order', productCtrl.orderProducts);
 
 module.exports = router;
+
+let salut = 'product.js route'
