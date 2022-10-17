@@ -1,82 +1,120 @@
 
-async function returnFetch(url) {
-    return await fetch(url)
-        .then(function (response) {
-            if (response.ok) {
-                return response.json();
-            }
-        })
-        .then(function (products) {
-            return products;
-        })
-        .catch(function (error) {
-            console.error(error);
-        })
+const querryString_url_id = window.location.search;
+const searchParams = new URLSearchParams(querryString_url_id);
+const currentIdOnPage = searchParams.get('id');
+console.log(currentIdOnPage);
+
+//Get Element By Id on Page------------------------------------------------------------
+
+const getNameOfProduct = document.getElementById('title');
+const getImgContainerOfProduct = document.getElementsByClassName('item__img').item(0);
+const getPriceOfProduct = document.getElementById('price');
+const getDescriptionOfProduct = document.getElementById('description');
+const getColorsContainerOfProduct = document.getElementById('colors');
+const getQuantityOfProduct = document.getElementById('quantity');
+
+
+//Put Element of products in each ID or Class of the product.html page
+function displayProductsOnPage(products) {
+    getNameOfProduct.innerHTML = products.name;
+    getPriceOfProduct.innerHTML = products.price;
+    getDescriptionOfProduct.innerHTML = products.description;
 }
 
-const querryString_url_id = window.location.search;
+//Create IMG---------------------------------------------------------------------
+function displayImgOnPage(products) {
 
-//First way to find URL
-// const currentId = querryString_url_id.slice(4);
-// console.log(currentId);
-
-//Second Way to fin URL
-
-const searchParams = new URLSearchParams(querryString_url_id);
-// console.log(searchParams);
-
-const currentId = searchParams.get('id');
-console.log(currentId);
-
-//Utilisation de la methode .find()
-
-function displayOnProductsPage(products) {
-    const returnElementById = products.find((Element) => Element._id === currentId);
-
-
-    //Display image on product page
-    const findImg = document.getElementsByClassName('item__img').item(0);
     const createImg = document.createElement('img');
-    createImg.src = returnElementById.imageUrl;
-    createImg.alt = returnElementById.altTxt;
-    findImg.appendChild(createImg);
+    getImgContainerOfProduct.appendChild(createImg);
+    createImg.src = products.imageUrl;
+    createImg.alt = products.altTxt;
+    createImg.setAttribute('id', 'imgId');
+    getImg = document.getElementById('imgId').src;
+}
 
-    //Display title on product page
-    const findName = document.getElementById('title');
-    findName.innerHTML = returnElementById.name;
+//Insert Colors of product into the <select> tagname----------------------------------
+function displayColorsOnPage(products) {
+    for (const colors in products.colors) {
+        const createColor = document.createElement('option');
+        createColor.innerHTML = products.colors[colors];
+        createColor.value = products.colors[colors];
+        getColorsContainerOfProduct.appendChild(createColor);
+    }
+}
 
-    //Display description on product page
-    const findDescription = document.getElementById('description');
-    findDescription.innerHTML = returnElementById.description;
+function displayProduct(product) {
+    displayProductsOnPage(product)
+    displayImgOnPage(product)
+    displayColorsOnPage(product)
+}
 
-    //Display price on product page
-    const findPrice = document.getElementById('price');
-    findPrice.innerHTML = returnElementById.price;
 
-  //  Display colors on product page
-    function addColor() {
-        const findColors = document.getElementById('colors');
+// Basket management
+let arrayBasket = []
 
-        //find each colors in products.color and apply to option
-        for (const color in returnElementById.colors) {
-
-            const createColor = document.createElement('option');
-            createColor.innerHTML = returnElementById.colors[color];
-            createColor.value = returnElementById.colors[color];
-
-            findColors.appendChild(createColor);
-
+function addToBasket(productCommand) {
+    // productCommand {id, color, quantity}
+    //Si on veut ajouter un element au tableau arraybasket, recuperer l'objet et les inplementer à la suite.
+    for (const command of arrayBasket) {
+        if (command._id === productCommand._id && command.color === productCommand.color) {
+            //Le produit demandé existe deja dans le panier
+            command.quantity += productCommand.quantity;
+            save('cart', arrayBasket);
+            return;
         }
     }
-    addColor()
+
+    // ajouter un objet du clik dans le tableau arraybasket
+
+    arrayBasket.push(productCommand);
+
+    //trier le tableau et regroupe les elements par ID
+    arrayBasket.sort(function compare(a, b) {
+        if (a._id < b._id)
+           return -1;
+        if (a._id > b._id )
+           return 1;
+        return 0;
+    });
+    save('cart', arrayBasket);
 
 }
 
 
 
-async function main() {
-    const products = await returnFetch('http://localhost:3000/api/products')
-    displayOnProductsPage(products)
+//Create array with the different products selected when you click on button
 
+const buttonBasket = document.getElementById('addToCart')
+
+buttonBasket.addEventListener('click', function () {
+
+    const productCommand = {
+        _id: currentIdOnPage,
+        color: getColorsContainerOfProduct.options[getColorsContainerOfProduct.selectedIndex].value,
+        quantity: parseInt(getQuantityOfProduct.value),
+    }
+    if(productCommand.color === "") {
+        alert('veuillez choisir une couleur');
+        return
+    }
+    if(productCommand.quantity < 1 || productCommand.quantity > 99) {
+        alert('veuillez choisir une quantitée entre 1 et 99');
+        return
+    }
+    addToBasket(productCommand)
+    alert('votre produit est ajouté au panier')
+    console.log(arrayBasket);
+
+});
+
+//Insert arrayBasket into the local storage
+
+
+//Get The object of the Kanap Clicked. Then Call the differents functions created-----------------------
+async function main() {
+    arrayBasket = loadBasket('cart')
+    const products = await getData('http://localhost:3000/api/products/' + currentIdOnPage)
+    //console.log(products)
+    displayProduct(products)
 }
 main()
