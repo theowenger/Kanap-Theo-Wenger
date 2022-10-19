@@ -142,6 +142,13 @@ function listenToChangeQuantity(products) {
 
   var _loop2 = function _loop2(i) {
     itemsQuantity[i].addEventListener('change', function (e) {
+      if (e.target.value > 100 || e.target.value < 1) {
+        alert('Veuillez selectionner entre 1 et 100 articles');
+        store = loadBasket('cart');
+        e.target.value = store[i].quantity;
+        return;
+      }
+
       store = loadBasket('cart');
       e.preventDefault;
       products[i].quantity = Number(e.target.value);
@@ -155,6 +162,30 @@ function listenToChangeQuantity(products) {
   for (var i = 0; i < itemsQuantity.length; i++) {
     _loop2(i);
   }
+}
+
+function getUserCommand() {
+  var getUserForm = document.getElementsByTagName('form'); // getUserForm.('confirmation.html')
+
+  var getFirstName = document.getElementById('firstName');
+  var getLastName = document.getElementById('lastName');
+  var getAddress = document.getElementById('address');
+  var getCity = document.getElementById('city');
+  var getEmail = document.getElementById('email');
+  var getButtonCommand = document.getElementById('order');
+  getButtonCommand.addEventListener('click', function (e) {
+    var userList = {
+      firstName: getFirstName.value,
+      lastName: getLastName.value,
+      address: getAddress.value,
+      city: getCity.value,
+      mail: getEmail.value
+    };
+    e.preventDefault;
+    console.log(userList);
+    console.log(e);
+    save('user', userList);
+  });
 }
 
 function main() {
@@ -174,8 +205,9 @@ function main() {
           listenToDeleteButton(products);
           listenToChangeQuantity(products);
           displayTotalPrice(products);
+          getUserCommand();
 
-        case 9:
+        case 10:
         case "end":
           return _context2.stop();
       }

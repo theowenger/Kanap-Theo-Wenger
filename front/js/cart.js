@@ -138,6 +138,12 @@ function listenToChangeQuantity(products) {
     for (let i = 0; i < itemsQuantity.length; i++) {
 
         itemsQuantity[i].addEventListener('change', (e) => {
+            if (e.target.value > 100 || e.target.value <1) {
+                alert('Veuillez selectionner entre 1 et 100 articles')
+                store = loadBasket('cart')
+                e.target.value = store[i].quantity
+                return
+                }
             store = loadBasket('cart')
             e.preventDefault;
             products[i].quantity = Number(e.target.value);
@@ -149,6 +155,35 @@ function listenToChangeQuantity(products) {
     }
 }
 
+
+
+
+function getUserCommand(){
+
+    const getUserForm = document.getElementsByTagName('form')
+    // getUserForm.('confirmation.html')
+    
+    const getFirstName = document.getElementById('firstName')
+    const getLastName = document.getElementById('lastName')
+    const getAddress = document.getElementById('address')
+    const getCity = document.getElementById('city')
+    const getEmail = document.getElementById('email')
+    const getButtonCommand = document.getElementById('order');
+    
+    getButtonCommand.addEventListener('click', (e)  => {
+        let userList = {
+            firstName: getFirstName.value,
+            lastName: getLastName.value,
+            address: getAddress.value,
+            city: getCity.value,
+            mail: getEmail.value,
+        }
+       e.preventDefault
+        console.log(userList);
+        console.log(e);
+        save('user', userList)
+    })
+}
 async function main() {
     loadBasket("cart");
     const allProducts = await getData('http://localhost:3000/api/products')
@@ -158,5 +193,6 @@ async function main() {
     listenToDeleteButton(products)
     listenToChangeQuantity(products)
     displayTotalPrice(products)
+    getUserCommand()
 }
 main()
