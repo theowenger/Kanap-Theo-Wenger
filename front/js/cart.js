@@ -138,19 +138,19 @@ function listenToChangeQuantity(products) {
     for (let i = 0; i < itemsQuantity.length; i++) {
 
         itemsQuantity[i].addEventListener('change', (e) => {
-            if (e.target.value > 100 || e.target.value <1) {
+            if (e.target.value > 100 || e.target.value < 1) {
                 alert('Veuillez selectionner entre 1 et 100 articles')
                 store = loadBasket('cart')
                 e.target.value = store[i].quantity
                 return
-                }
+            }
             store = loadBasket('cart')
             e.preventDefault;
             products[i].quantity = Number(e.target.value);
             store[i].quantity = Number(e.target.value);
             itemsQuantity[i].setAttribute('value', e.target.value)
             displayTotalPrice(products)
-        save('cart', store)
+            save('cart', store)
         })
     }
 }
@@ -158,30 +158,34 @@ function listenToChangeQuantity(products) {
 
 
 
-function getUserCommand(){
-
-    const getUserForm = document.getElementsByTagName('form')
-    // getUserForm.('confirmation.html')
-    
-    const getFirstName = document.getElementById('firstName')
-    const getLastName = document.getElementById('lastName')
-    const getAddress = document.getElementById('address')
-    const getCity = document.getElementById('city')
-    const getEmail = document.getElementById('email')
-    const getButtonCommand = document.getElementById('order');
-    
-    getButtonCommand.addEventListener('click', (e)  => {
-        let userList = {
-            firstName: getFirstName.value,
-            lastName: getLastName.value,
-            address: getAddress.value,
-            city: getCity.value,
-            mail: getEmail.value,
+function getUserCommand() {
+    const firstNameInput = document.getElementById('firstName')
+    const lastNameInput = document.getElementById('lastName')
+    const addressInput = document.getElementById('address')
+    const cityInput = document.getElementById('city')
+    const emailInput = document.getElementById('email')
+    const buttonCommandInput = document.getElementById('order').addEventListener('click', (e) => {
+        e.preventDefault()
+        hideError(emailInput)
+        hideError(firstNameInput)
+        if(!isFirstNameValid(firstNameInput.value)) {
+            showError(firstNameInput, 'merci de renseigner un prenom valide')
+            return
         }
-       e.preventDefault
-        console.log(userList);
-        console.log(e);
-        save('user', userList)
+        if(!isEmailValid(emailInput.value)) {
+            showError(emailInput, 'merci de renseigner une adresse mail valide')
+            return
+        } else {
+            let user = {
+                firstName: firstNameInput.value,
+                lastName: lastNameInput.value,
+                address: addressInput.value,
+                city: cityInput.value,
+                email: emailInput.value,
+            }
+            console.log(user);
+            save('user', user)
+        }
     })
 }
 async function main() {
@@ -196,3 +200,27 @@ async function main() {
     getUserCommand()
 }
 main()
+
+function isFirstNameValid(firstName) {
+    if(firstName.trim(' ').length < 3) {
+        alert('veuillez selectionner au moins trois caractères')
+    }
+    let pattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]/;
+    return pattern.test(firstName)
+}
+
+function isEmailValid(email) {
+    let pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
+    return pattern.test(email)
+}
+
+
+function showError(element, message) {
+    let errorElement = element.nextElementSibling
+    errorElement.innerText = message;
+}
+
+function hideError(element) {
+    let errorElement = element.nextElementSibling
+    errorElement.innerText = '';
+}

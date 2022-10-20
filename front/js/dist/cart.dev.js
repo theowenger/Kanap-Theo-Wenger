@@ -165,26 +165,35 @@ function listenToChangeQuantity(products) {
 }
 
 function getUserCommand() {
-  var getUserForm = document.getElementsByTagName('form'); // getUserForm.('confirmation.html')
+  var firstNameInput = document.getElementById('firstName');
+  var lastNameInput = document.getElementById('lastName');
+  var addressInput = document.getElementById('address');
+  var cityInput = document.getElementById('city');
+  var emailInput = document.getElementById('email');
+  var buttonCommandInput = document.getElementById('order').addEventListener('click', function (e) {
+    e.preventDefault();
+    hideError(emailInput);
+    hideError(firstNameInput);
 
-  var getFirstName = document.getElementById('firstName');
-  var getLastName = document.getElementById('lastName');
-  var getAddress = document.getElementById('address');
-  var getCity = document.getElementById('city');
-  var getEmail = document.getElementById('email');
-  var getButtonCommand = document.getElementById('order');
-  getButtonCommand.addEventListener('click', function (e) {
-    var userList = {
-      firstName: getFirstName.value,
-      lastName: getLastName.value,
-      address: getAddress.value,
-      city: getCity.value,
-      mail: getEmail.value
-    };
-    e.preventDefault;
-    console.log(userList);
-    console.log(e);
-    save('user', userList);
+    if (!isFirstNameValid(firstNameInput.value)) {
+      showError(firstNameInput, 'merci de renseigner un prenom valide');
+      return;
+    }
+
+    if (!isEmailValid(emailInput.value)) {
+      showError(emailInput, 'merci de renseigner une adresse mail valide');
+      return;
+    } else {
+      var user = {
+        firstName: firstNameInput.value,
+        lastName: lastNameInput.value,
+        address: addressInput.value,
+        city: cityInput.value,
+        email: emailInput.value
+      };
+      console.log(user);
+      save('user', user);
+    }
   });
 }
 
@@ -216,3 +225,27 @@ function main() {
 }
 
 main();
+
+function isFirstNameValid(firstName) {
+  if (firstName.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères');
+  }
+
+  var pattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]/;
+  return pattern.test(firstName);
+}
+
+function isEmailValid(email) {
+  var pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
+  return pattern.test(email);
+}
+
+function showError(element, message) {
+  var errorElement = element.nextElementSibling;
+  errorElement.innerText = message;
+}
+
+function hideError(element) {
+  var errorElement = element.nextElementSibling;
+  errorElement.innerText = '';
+}

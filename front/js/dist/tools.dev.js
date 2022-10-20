@@ -11,9 +11,10 @@ function getData(url) {
               return response.json();
             }
 
-            throw "Ce produit n'existe pas";
+            throw "Ce produit n'existe pas, vous serez rediriger vers la page d'acceuil";
           })["catch"](function (error) {
             alert(error);
+            window.location.href = "./index.html";
           }));
 
         case 2:
