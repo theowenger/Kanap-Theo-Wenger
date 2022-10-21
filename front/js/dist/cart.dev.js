@@ -172,11 +172,29 @@ function getUserCommand() {
   var emailInput = document.getElementById('email');
   var buttonCommandInput = document.getElementById('order').addEventListener('click', function (e) {
     e.preventDefault();
-    hideError(emailInput);
     hideError(firstNameInput);
+    hideError(lastNameInput);
+    hideError(addressInput);
+    hideError(cityInput);
+    hideError(emailInput);
 
     if (!isFirstNameValid(firstNameInput.value)) {
       showError(firstNameInput, 'merci de renseigner un prenom valide');
+      return;
+    }
+
+    if (!isLasttNameValid(lastNameInput.value)) {
+      showError(lastNameInput, 'merci de renseigner un nom valide');
+      return;
+    }
+
+    if (!isAddressValid(addressInput.value)) {
+      showError(addressInput, 'merci de renseigner une adresse valide');
+      return;
+    }
+
+    if (!isCityValid(cityInput.value)) {
+      showError(cityInput, 'merci de renseigner un nom de ville valide');
       return;
     }
 
@@ -193,9 +211,27 @@ function getUserCommand() {
       };
       console.log(user);
       save('user', user);
+      var productId = store.map(function (a) {
+        return a._id;
+      });
+      console.log(productId);
     }
   });
 }
+/*            const result = await fetch('http://localhost:3000/api/products/order', {
+              method: "POST",
+              body: {
+                contact: user,
+                products : []
+              }
+            }).then(function (response) {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+            console.log(result);
+    })*/
+
 
 function main() {
   var allProducts, products;
@@ -229,10 +265,41 @@ main();
 function isFirstNameValid(firstName) {
   if (firstName.trim(' ').length < 3) {
     alert('veuillez selectionner au moins trois caractères');
+    return;
   }
 
-  var pattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]/;
+  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
   return pattern.test(firstName);
+}
+
+function isLasttNameValid(lastName) {
+  if (lastName.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères');
+    return;
+  }
+
+  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  return pattern.test(lastName);
+}
+
+function isAddressValid(address) {
+  if (address.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères');
+    return;
+  }
+
+  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  return pattern.test(address);
+}
+
+function isCityValid(city) {
+  if (city.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères');
+    return;
+  }
+
+  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  return pattern.test(city);
 }
 
 function isEmailValid(email) {

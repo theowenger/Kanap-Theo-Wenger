@@ -166,16 +166,32 @@ function getUserCommand() {
     const emailInput = document.getElementById('email')
     const buttonCommandInput = document.getElementById('order').addEventListener('click', (e) => {
         e.preventDefault()
-        hideError(emailInput)
         hideError(firstNameInput)
+        hideError(lastNameInput)
+        hideError(addressInput)
+        hideError(cityInput)
+        hideError(emailInput)
         if(!isFirstNameValid(firstNameInput.value)) {
             showError(firstNameInput, 'merci de renseigner un prenom valide')
             return
         }
-        if(!isEmailValid(emailInput.value)) {
-            showError(emailInput, 'merci de renseigner une adresse mail valide')
+        if(!isLasttNameValid(lastNameInput.value)) {
+            showError(lastNameInput, 'merci de renseigner un nom valide')
             return
-        } else {
+        }
+        if(!isAddressValid(addressInput.value)) {
+            showError(addressInput, 'merci de renseigner une adresse valide')
+            return
+        }
+        if(!isCityValid(cityInput.value)) {
+            showError(cityInput, 'merci de renseigner un nom de ville valide')
+            return
+        }
+        if(!isEmailValid(emailInput.value)) {
+          showError(emailInput, 'merci de renseigner une adresse mail valide')
+          return
+        }
+        else {
             let user = {
                 firstName: firstNameInput.value,
                 lastName: lastNameInput.value,
@@ -185,9 +201,26 @@ function getUserCommand() {
             }
             console.log(user);
             save('user', user)
+            const productId = store.map(a => a._id);
+            console.log(productId)
         }
     })
 }
+
+/*            const result = await fetch('http://localhost:3000/api/products/order', {
+              method: "POST",
+              body: {
+                contact: user,
+                products : []
+              }
+            }).then(function (response) {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+            console.log(result);
+    })*/
+
 async function main() {
     loadBasket("cart");
     const allProducts = await getData('http://localhost:3000/api/products')
@@ -204,9 +237,37 @@ main()
 function isFirstNameValid(firstName) {
     if(firstName.trim(' ').length < 3) {
         alert('veuillez selectionner au moins trois caractères')
+        return
     }
-    let pattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]/;
+    let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
     return pattern.test(firstName)
+}
+
+function isLasttNameValid(lastName) {
+  if(lastName.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères')
+    return
+}
+  let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  return pattern.test(lastName)
+}
+
+function isAddressValid(address) {
+  if(address.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères')
+    return
+}
+  let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  return pattern.test(address)
+}
+
+function isCityValid(city) {
+  if(city.trim(' ').length < 3) {
+    alert('veuillez selectionner au moins trois caractères')
+    return
+}
+  let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  return pattern.test(city)
 }
 
 function isEmailValid(email) {
