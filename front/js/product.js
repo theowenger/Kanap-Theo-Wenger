@@ -1,8 +1,7 @@
-
+//Get URL and catch Only character after ID to have the valid ID to get on back
 const querryString_url_id = window.location.search;
 const searchParams = new URLSearchParams(querryString_url_id);
 const currentIdOnPage = searchParams.get('id');
-console.log(currentIdOnPage);
 
 //Get Element By Id on Page------------------------------------------------------------
 
@@ -41,13 +40,12 @@ function displayColorsOnPage(products) {
         getColorsContainerOfProduct.appendChild(createColor);
     }
 }
-
+//Call the 3 display Function------------------------------------------------------------------------
 function displayProduct(product) {
     displayProductsOnPage(product)
     displayImgOnPage(product)
     displayColorsOnPage(product)
 }
-
 
 // Basket management
 let arrayBasket = []
@@ -65,7 +63,6 @@ function addToBasket(productCommand) {
     }
 
     // ajouter un objet du clik dans le tableau arraybasket
-
     arrayBasket.push(productCommand);
 
     //trier le tableau et regroupe les elements par ID
@@ -80,13 +77,12 @@ function addToBasket(productCommand) {
 
 }
 
-
-
 //Create array with the different products selected when you click on button
 
 const buttonBasket = document.getElementById('addToCart')
 
-buttonBasket.addEventListener('click', function () {
+buttonBasket.addEventListener('click',  async function () {
+    const products = await getData('http://localhost:3000/api/products/' + currentIdOnPage)
 
     const productCommand = {
         _id: currentIdOnPage,
@@ -101,9 +97,14 @@ buttonBasket.addEventListener('click', function () {
         alert('veuillez choisir une quantitée entre 1 et 99');
         return
     }
-    addToBasket(productCommand)
-    alert('votre produit est ajouté au panier')
-    console.log(arrayBasket);
+    for (const i in products.colors) {
+        if(productCommand.color === products.colors[i]) {
+            addToBasket(productCommand)
+            alert('votre produit est ajouté au panier')
+            return
+        }
+    }
+    alert('la couleur selectionnée n\'existe pas');
 
 });
 
@@ -114,7 +115,7 @@ buttonBasket.addEventListener('click', function () {
 async function main() {
     arrayBasket = loadBasket('cart')
     const products = await getData('http://localhost:3000/api/products/' + currentIdOnPage)
-    //console.log(products)
+    console.log(products)
     displayProduct(products)
 }
 main()

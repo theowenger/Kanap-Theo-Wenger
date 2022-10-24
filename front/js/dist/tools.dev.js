@@ -1,5 +1,6 @@
 "use strict";
 
+//get the different Data on the URL
 function getData(url) {
   return regeneratorRuntime.async(function getData$(_context) {
     while (1) {
@@ -26,11 +27,13 @@ function getData(url) {
       }
     }
   });
-}
+} //Save the value on the local Storage
+
 
 function save(key, value) {
   localStorage.setItem(key, JSON.stringify(value));
-}
+} //Load since the local Storage on the markup
+
 
 function loadBasket(key) {
   var store = localStorage.getItem(key);

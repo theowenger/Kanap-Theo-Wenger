@@ -1,9 +1,9 @@
 "use strict";
 
+//Get URL and catch Only character after ID to have the valid ID to get on back
 var querryString_url_id = window.location.search;
 var searchParams = new URLSearchParams(querryString_url_id);
-var currentIdOnPage = searchParams.get('id');
-console.log(currentIdOnPage); //Get Element By Id on Page------------------------------------------------------------
+var currentIdOnPage = searchParams.get('id'); //Get Element By Id on Page------------------------------------------------------------
 
 var getNameOfProduct = document.getElementById('title');
 var getImgContainerOfProduct = document.getElementsByClassName('item__img').item(0);
@@ -36,7 +36,8 @@ function displayColorsOnPage(products) {
     createColor.value = products.colors[colors];
     getColorsContainerOfProduct.appendChild(createColor);
   }
-}
+} //Call the 3 display Function------------------------------------------------------------------------
+
 
 function displayProduct(product) {
   displayProductsOnPage(product);
@@ -93,47 +94,94 @@ function addToBasket(productCommand) {
 
 
 var buttonBasket = document.getElementById('addToCart');
-buttonBasket.addEventListener('click', function () {
-  var productCommand = {
-    _id: currentIdOnPage,
-    color: getColorsContainerOfProduct.options[getColorsContainerOfProduct.selectedIndex].value,
-    quantity: parseInt(getQuantityOfProduct.value)
-  };
+buttonBasket.addEventListener('click', function _callee() {
+  var products, productCommand, i;
+  return regeneratorRuntime.async(function _callee$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.next = 2;
+          return regeneratorRuntime.awrap(getData('http://localhost:3000/api/products/' + currentIdOnPage));
 
-  if (productCommand.color === "") {
-    alert('veuillez choisir une couleur');
-    return;
-  }
+        case 2:
+          products = _context.sent;
+          productCommand = {
+            _id: currentIdOnPage,
+            color: getColorsContainerOfProduct.options[getColorsContainerOfProduct.selectedIndex].value,
+            quantity: parseInt(getQuantityOfProduct.value)
+          };
 
-  if (productCommand.quantity < 1 || productCommand.quantity > 99) {
-    alert('veuillez choisir une quantitée entre 1 et 99');
-    return;
-  }
+          if (!(productCommand.color === "")) {
+            _context.next = 7;
+            break;
+          }
 
-  addToBasket(productCommand);
-  alert('votre produit est ajouté au panier');
-  console.log(arrayBasket);
+          alert('veuillez choisir une couleur');
+          return _context.abrupt("return");
+
+        case 7:
+          if (!(productCommand.quantity < 1 || productCommand.quantity > 99)) {
+            _context.next = 10;
+            break;
+          }
+
+          alert('veuillez choisir une quantitée entre 1 et 99');
+          return _context.abrupt("return");
+
+        case 10:
+          _context.t0 = regeneratorRuntime.keys(products.colors);
+
+        case 11:
+          if ((_context.t1 = _context.t0()).done) {
+            _context.next = 19;
+            break;
+          }
+
+          i = _context.t1.value;
+
+          if (!(productCommand.color === products.colors[i])) {
+            _context.next = 17;
+            break;
+          }
+
+          addToBasket(productCommand);
+          alert('votre produit est ajouté au panier');
+          return _context.abrupt("return");
+
+        case 17:
+          _context.next = 11;
+          break;
+
+        case 19:
+          alert('la couleur selectionnée n\'existe pas');
+
+        case 20:
+        case "end":
+          return _context.stop();
+      }
+    }
+  });
 }); //Insert arrayBasket into the local storage
 //Get The object of the Kanap Clicked. Then Call the differents functions created-----------------------
 
 function main() {
   var products;
-  return regeneratorRuntime.async(function main$(_context) {
+  return regeneratorRuntime.async(function main$(_context2) {
     while (1) {
-      switch (_context.prev = _context.next) {
+      switch (_context2.prev = _context2.next) {
         case 0:
           arrayBasket = loadBasket('cart');
-          _context.next = 3;
+          _context2.next = 3;
           return regeneratorRuntime.awrap(getData('http://localhost:3000/api/products/' + currentIdOnPage));
 
         case 3:
-          products = _context.sent;
-          //console.log(products)
+          products = _context2.sent;
+          console.log(products);
           displayProduct(products);
 
-        case 5:
+        case 6:
         case "end":
-          return _context.stop();
+          return _context2.stop();
       }
     }
   });

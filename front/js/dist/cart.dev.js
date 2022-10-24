@@ -1,8 +1,9 @@
 "use strict";
 
+//Get the localStorage and catch Price and quantity
 var store = loadBasket('cart');
 var getTotalPrice = document.getElementById('totalPrice');
-var getTotalQuantity = document.getElementById('totalQuantity');
+var getTotalQuantity = document.getElementById('totalQuantity'); //Display all the index of Local Storage
 
 var displayBasket = function displayBasket(products) {
   return regeneratorRuntime.async(function displayBasket$(_context) {
@@ -71,7 +72,8 @@ var displayBasket = function displayBasket(products) {
       }
     }
   });
-};
+}; //Get 2 array: LocalStorage and Products API and join in a new array call List
+
 
 function buildCompleteList(productsStore, productsApi) {
   var list = [];
@@ -106,7 +108,8 @@ function displayTotalPrice(list) {
     getTotalPrice.innerHTML = totalPrice;
     getTotalQuantity.innerHTML = totalQuantity;
   }
-}
+} //listen the delete Button and delete the product of DOM
+
 
 function listenToDeleteButton(products) {
   var deleteButton = document.querySelectorAll('.deleteItem');
@@ -135,7 +138,8 @@ function listenToDeleteButton(products) {
   for (var i = 0; i < products.length; i++) {
     _loop(i);
   }
-}
+} //Listen the input quantity and modify in DOM and in LocalStorage
+
 
 function listenToChangeQuantity(products) {
   var itemsQuantity = document.querySelectorAll('.itemQuantity');
@@ -162,7 +166,8 @@ function listenToChangeQuantity(products) {
   for (var i = 0; i < itemsQuantity.length; i++) {
     _loop2(i);
   }
-}
+} //Listen all the form value and send to the confirmation page in a new array named Payload
+
 
 function getUserCommand() {
   var firstNameInput = document.getElementById('firstName');
@@ -170,97 +175,115 @@ function getUserCommand() {
   var addressInput = document.getElementById('address');
   var cityInput = document.getElementById('city');
   var emailInput = document.getElementById('email');
-  var buttonCommandInput = document.getElementById('order').addEventListener('click', function (e) {
-    e.preventDefault();
-    hideError(firstNameInput);
-    hideError(lastNameInput);
-    hideError(addressInput);
-    hideError(cityInput);
-    hideError(emailInput);
+  var buttonCommandInput = document.getElementById('order').addEventListener('click', function _callee(e) {
+    var payload, result, orderId;
+    return regeneratorRuntime.async(function _callee$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            e.preventDefault();
+            hideError(firstNameInput);
+            hideError(lastNameInput);
+            hideError(addressInput);
+            hideError(cityInput);
+            hideError(emailInput);
 
-    if (!isFirstNameValid(firstNameInput.value)) {
-      showError(firstNameInput, 'merci de renseigner un prenom valide');
-      return;
-    }
+            if (isFirstNameValid(firstNameInput.value)) {
+              _context2.next = 9;
+              break;
+            }
 
-    if (!isLasttNameValid(lastNameInput.value)) {
-      showError(lastNameInput, 'merci de renseigner un nom valide');
-      return;
-    }
+            showError(firstNameInput, 'merci de renseigner un prenom valide');
+            return _context2.abrupt("return");
 
-    if (!isAddressValid(addressInput.value)) {
-      showError(addressInput, 'merci de renseigner une adresse valide');
-      return;
-    }
+          case 9:
+            if (isLasttNameValid(lastNameInput.value)) {
+              _context2.next = 12;
+              break;
+            }
 
-    if (!isCityValid(cityInput.value)) {
-      showError(cityInput, 'merci de renseigner un nom de ville valide');
-      return;
-    }
+            showError(lastNameInput, 'merci de renseigner un nom valide');
+            return _context2.abrupt("return");
 
-    if (!isEmailValid(emailInput.value)) {
-      showError(emailInput, 'merci de renseigner une adresse mail valide');
-      return;
-    } else {
-      var user = {
-        firstName: firstNameInput.value,
-        lastName: lastNameInput.value,
-        address: addressInput.value,
-        city: cityInput.value,
-        email: emailInput.value
-      };
-      console.log(user);
-      save('user', user);
-      var productId = store.map(function (a) {
-        return a._id;
-      });
-      console.log(productId);
-    }
-  });
-}
-/*            const result = await fetch('http://localhost:3000/api/products/order', {
+          case 12:
+            if (isAddressValid(addressInput.value)) {
+              _context2.next = 15;
+              break;
+            }
+
+            showError(addressInput, 'merci de renseigner une adresse valide');
+            return _context2.abrupt("return");
+
+          case 15:
+            if (isCityValid(cityInput.value)) {
+              _context2.next = 18;
+              break;
+            }
+
+            showError(cityInput, 'merci de renseigner un nom de ville valide');
+            return _context2.abrupt("return");
+
+          case 18:
+            if (isEmailValid(emailInput.value)) {
+              _context2.next = 21;
+              break;
+            }
+
+            showError(emailInput, 'merci de renseigner une adresse mail valide');
+            return _context2.abrupt("return");
+
+          case 21:
+            payload = {
+              contact: {
+                firstName: firstNameInput.value,
+                lastName: lastNameInput.value,
+                address: addressInput.value,
+                city: cityInput.value,
+                email: emailInput.value
+              },
+              products: store.map(function (a) {
+                return a._id;
+              })
+            };
+            _context2.next = 24;
+            return regeneratorRuntime.awrap(fetch('http://localhost:3000/api/products/order', {
               method: "POST",
-              body: {
-                contact: user,
-                products : []
-              }
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
             }).then(function (response) {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-            console.log(result);
-    })*/
+              if (response.ok) {
+                return response.json();
+              }
+            }));
 
+          case 24:
+            result = _context2.sent;
+            orderId = result.orderId;
+            location.href = "./confirmation.html?order=".concat(orderId);
 
-function main() {
-  var allProducts, products;
-  return regeneratorRuntime.async(function main$(_context2) {
-    while (1) {
-      switch (_context2.prev = _context2.next) {
-        case 0:
-          loadBasket("cart");
-          _context2.next = 3;
-          return regeneratorRuntime.awrap(getData('http://localhost:3000/api/products'));
-
-        case 3:
-          allProducts = _context2.sent;
-          products = buildCompleteList(store, allProducts);
-          displayBasket(products);
-          listenToDeleteButton(products);
-          listenToChangeQuantity(products);
-          displayTotalPrice(products);
-          getUserCommand();
-
-        case 10:
-        case "end":
-          return _context2.stop();
+          case 27:
+          case "end":
+            return _context2.stop();
+        }
       }
-    }
+    });
   });
+} //display an error message if wrong
+
+
+function showError(element, message) {
+  var errorElement = element.nextElementSibling;
+  errorElement.innerText = message;
 }
 
-main();
+function hideError(element) {
+  var errorElement = element.nextElementSibling;
+  errorElement.innerText = '';
+} //Function who's search in the value of form all the prohibited character and return an alert
+
 
 function isFirstNameValid(firstName) {
   if (firstName.trim(' ').length < 3) {
@@ -268,7 +291,7 @@ function isFirstNameValid(firstName) {
     return;
   }
 
-  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  var pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
   return pattern.test(firstName);
 }
 
@@ -278,7 +301,7 @@ function isLasttNameValid(lastName) {
     return;
   }
 
-  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  var pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
   return pattern.test(lastName);
 }
 
@@ -298,21 +321,41 @@ function isCityValid(city) {
     return;
   }
 
-  var pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+  var pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
   return pattern.test(city);
 }
 
 function isEmailValid(email) {
   var pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
   return pattern.test(email);
+} //main Function call all the function necessary on the load page
+
+
+function main() {
+  var allProducts, products;
+  return regeneratorRuntime.async(function main$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          loadBasket("cart");
+          _context3.next = 3;
+          return regeneratorRuntime.awrap(getData('http://localhost:3000/api/products'));
+
+        case 3:
+          allProducts = _context3.sent;
+          products = buildCompleteList(store, allProducts);
+          displayBasket(products);
+          listenToDeleteButton(products);
+          listenToChangeQuantity(products);
+          displayTotalPrice(products);
+          getUserCommand();
+
+        case 10:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  });
 }
 
-function showError(element, message) {
-  var errorElement = element.nextElementSibling;
-  errorElement.innerText = message;
-}
-
-function hideError(element) {
-  var errorElement = element.nextElementSibling;
-  errorElement.innerText = '';
-}
+main();

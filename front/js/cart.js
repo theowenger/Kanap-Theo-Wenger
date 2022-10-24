@@ -1,8 +1,10 @@
+//Get the localStorage and catch Price and quantity
+
 let store = loadBasket('cart');
 const getTotalPrice = document.getElementById('totalPrice')
 const getTotalQuantity = document.getElementById('totalQuantity')
 
-
+//Display all the index of Local Storage
 const displayBasket = async (products) => {
     products.forEach(element => {
         //Create each element of the basket and give it a className
@@ -70,7 +72,7 @@ const displayBasket = async (products) => {
 
 };
 
-
+//Get 2 array: LocalStorage and Products API and join in a new array call List
 function buildCompleteList(productsStore, productsApi) {
     let list = []
     productsStore.forEach(productStore => {
@@ -107,7 +109,7 @@ function displayTotalPrice(list) {
 }
 
 
-
+//listen the delete Button and delete the product of DOM
 function listenToDeleteButton(products) {
 
     const deleteButton = document.querySelectorAll('.deleteItem')
@@ -130,7 +132,7 @@ function listenToDeleteButton(products) {
         })
     }
 }
-
+//Listen the input quantity and modify in DOM and in LocalStorage
 function listenToChangeQuantity(products) {
 
     const itemsQuantity = document.querySelectorAll('.itemQuantity')
@@ -157,14 +159,14 @@ function listenToChangeQuantity(products) {
 
 
 
-
+//Listen all the form value and send to the confirmation page in a new array named Payload
 function getUserCommand() {
     const firstNameInput = document.getElementById('firstName')
     const lastNameInput = document.getElementById('lastName')
     const addressInput = document.getElementById('address')
     const cityInput = document.getElementById('city')
     const emailInput = document.getElementById('email')
-    const buttonCommandInput = document.getElementById('order').addEventListener('click', (e) => {
+    const buttonCommandInput = document.getElementById('order').addEventListener('click', async (e) => {
         e.preventDefault()
         hideError(firstNameInput)
         hideError(lastNameInput)
@@ -191,55 +193,53 @@ function getUserCommand() {
           showError(emailInput, 'merci de renseigner une adresse mail valide')
           return
         }
-        else {
-            let user = {
+        
+            let payload = {
+                contact: {
                 firstName: firstNameInput.value,
                 lastName: lastNameInput.value,
                 address: addressInput.value,
                 city: cityInput.value,
                 email: emailInput.value,
-            }
-            console.log(user);
-            save('user', user)
-            const productId = store.map(a => a._id);
-            console.log(productId)
+            },
+            products: store.map(a => a._id)
         }
-    })
+
+
+            const result = await fetch('http://localhost:3000/api/products/order', {
+                method: "POST",
+                headers: {
+                    'Accept':  'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                body: JSON.stringify(payload)
+              }).then(function (response) {
+                          if (response.ok) {
+                              return response.json();
+                          }
+                      })
+                      const orderId = result.orderId;
+                      location.href= `./confirmation.html?order=${orderId}`
+      })
+    }
+    //display an error message if wrong
+function showError(element, message) {
+    let errorElement = element.nextElementSibling
+    errorElement.innerText = message;
 }
 
-/*            const result = await fetch('http://localhost:3000/api/products/order', {
-              method: "POST",
-              body: {
-                contact: user,
-                products : []
-              }
-            }).then(function (response) {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-            console.log(result);
-    })*/
-
-async function main() {
-    loadBasket("cart");
-    const allProducts = await getData('http://localhost:3000/api/products')
-
-    const products = buildCompleteList(store, allProducts);
-    displayBasket(products)
-    listenToDeleteButton(products)
-    listenToChangeQuantity(products)
-    displayTotalPrice(products)
-    getUserCommand()
+function hideError(element) {
+    let errorElement = element.nextElementSibling
+    errorElement.innerText = '';
 }
-main()
 
+//Function who's search in the value of form all the prohibited character and return an alert
 function isFirstNameValid(firstName) {
     if(firstName.trim(' ').length < 3) {
         alert('veuillez selectionner au moins trois caractères')
         return
     }
-    let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+    let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
     return pattern.test(firstName)
 }
 
@@ -248,7 +248,7 @@ function isLasttNameValid(lastName) {
     alert('veuillez selectionner au moins trois caractères')
     return
 }
-  let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
   return pattern.test(lastName)
 }
 
@@ -266,7 +266,7 @@ function isCityValid(city) {
     alert('veuillez selectionner au moins trois caractères')
     return
 }
-  let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
   return pattern.test(city)
 }
 
@@ -275,13 +275,16 @@ function isEmailValid(email) {
     return pattern.test(email)
 }
 
+//main Function call all the function necessary on the load page
+async function main() {
+    loadBasket("cart");
+    const allProducts = await getData('http://localhost:3000/api/products')
 
-function showError(element, message) {
-    let errorElement = element.nextElementSibling
-    errorElement.innerText = message;
+    const products = buildCompleteList(store, allProducts);
+    displayBasket(products)
+    listenToDeleteButton(products)
+    listenToChangeQuantity(products)
+    displayTotalPrice(products)
+    getUserCommand()
 }
-
-function hideError(element) {
-    let errorElement = element.nextElementSibling
-    errorElement.innerText = '';
-}
+main()

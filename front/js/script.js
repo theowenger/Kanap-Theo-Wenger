@@ -1,13 +1,13 @@
 
 
-//Affiche les produits à l'ecran -------------------------------------------
+//Display products on screen -------------------------------------------
 function displayProducts(products) {
     for (let i = 0; i < products.length; i++) {
         const productsIndex = products[i];
 
         const catchId = document.getElementById('items');
 
-        //creer les differents elements html
+        //create different elements html
 
         const createLink = document.createElement('a');
         createLink.href = './product.html?id=' + productsIndex._id;
@@ -18,39 +18,25 @@ function displayProducts(products) {
         const createDescription = document.createElement('p');
 
 
-        //inserer dynamiquement les elements du tableau dans le html
+        //insert the array element in DOM
 
         createImg.innerHTML = productsIndex.imageURL;
         createName.innerHTML = productsIndex.name;
         createDescription.innerHTML = productsIndex.description;
 
 
-        //integrer les elements HTML à leurs parents
+        //display the Markup element at his parents
 
         catchId.appendChild(createLink)
         createLink.appendChild(createArticle);
         createArticle.appendChild(createImg);
         createArticle.appendChild(createName);
         createArticle.appendChild(createDescription);
-
-        // console.log(createLink)
     }
 }
 
-//afficher sur la page web des produits -----------------------------------
 
-
-function displayOnProductsPage(product) {
-    for (let i = 0; i < products.length; i++) {
-        const productsIndex = products[i];
-
-
-    }
-
-}
-
-
-//Retourne l'API-----------------------------------------------------
+//Return API-----------------------------------------------------
 
 
 async function main() {
