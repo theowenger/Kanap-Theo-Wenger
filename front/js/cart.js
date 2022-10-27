@@ -26,7 +26,7 @@ const displayBasket = async (products) => {
 
         createH2.innerHTML = element.name;
         createPColor.innerHTML = element.color;
-        createPPrice.innerHTML = element.price + ",00 €";
+        createPPrice.innerHTML = money(element.price);
         createImg.src = element.imageUrl;
 
 
@@ -98,14 +98,14 @@ function buildCompleteList(productsStore, productsApi) {
 function displayTotalPrice(list) {
     let totalPrice = 0
     let totalQuantity = 0
-    for (let i = 0; i < list.length; i++) {
-        const price = list[i].price;
-        const quantity = list[i].quantity
+    list.forEach(element => {
+        const price = element.price;
+        const quantity = element.quantity
         totalPrice += price * quantity
         totalQuantity += quantity
-        getTotalPrice.innerHTML = totalPrice
+        getTotalPrice.innerHTML = money(totalPrice)
         getTotalQuantity.innerHTML = totalQuantity
-    }
+    });
 }
 
 
@@ -125,9 +125,9 @@ function listenToDeleteButton(products) {
             }
             let updateStore = store.filter(p => p._id !== id || p.color !== color)
             save('cart', updateStore)
-            getTotalPrice.innerHTML -= products[i].quantity * products[i].price
-            getTotalQuantity.innerHTML -= products[i].quantity
-            article.remove();
+            // getTotalPrice.innerHTML -= products[i].quantity * products[i].price
+            // getTotalQuantity.innerHTML -= products[i].quantity
+            // article.remove();
             window.location.reload()
         })
     }
@@ -160,7 +160,7 @@ function listenToChangeQuantity(products) {
 
 
 //Listen all the form value and send to the confirmation page in a new array named Payload
-function getUserCommand() {
+function getUserCommand(store) {
     const firstNameInput = document.getElementById('firstName')
     const lastNameInput = document.getElementById('lastName')
     const addressInput = document.getElementById('address')
@@ -173,29 +173,33 @@ function getUserCommand() {
         hideError(addressInput)
         hideError(cityInput)
         hideError(emailInput)
-        if(!isFirstNameValid(firstNameInput.value)) {
+        if (!isFirstNameValid(firstNameInput.value)) {
             showError(firstNameInput, 'merci de renseigner un prenom valide')
             return
         }
-        if(!isLasttNameValid(lastNameInput.value)) {
+        if (!isLasttNameValid(lastNameInput.value)) {
             showError(lastNameInput, 'merci de renseigner un nom valide')
             return
         }
-        if(!isAddressValid(addressInput.value)) {
+        if (!isAddressValid(addressInput.value)) {
             showError(addressInput, 'merci de renseigner une adresse valide')
             return
         }
-        if(!isCityValid(cityInput.value)) {
+        if (!isCityValid(cityInput.value)) {
             showError(cityInput, 'merci de renseigner un nom de ville valide')
             return
         }
-        if(!isEmailValid(emailInput.value)) {
-          showError(emailInput, 'merci de renseigner une adresse mail valide')
-          return
+        if (!isEmailValid(emailInput.value)) {
+            showError(emailInput, 'merci de renseigner une adresse mail valide')
+            return
         }
-        
-            let payload = {
-                contact: {
+        if (store.length === 0) {
+            alert('Votre panier est vide')
+            return
+        }
+
+        let payload = {
+            contact: {
                 firstName: firstNameInput.value,
                 lastName: lastNameInput.value,
                 address: addressInput.value,
@@ -205,24 +209,23 @@ function getUserCommand() {
             products: store.map(a => a._id)
         }
 
-
-            const result = await fetch('http://localhost:3000/api/products/order', {
-                method: "POST",
-                headers: {
-                    'Accept':  'application/json',
-                    'Content-Type': 'application/json'
-                  },
-                body: JSON.stringify(payload)
-              }).then(function (response) {
-                          if (response.ok) {
-                              return response.json();
-                          }
-                      })
-                      const orderId = result.orderId;
-                      location.href= `./confirmation.html?order=${orderId}`
-      })
-    }
-    //display an error message if wrong
+        const result = await fetch('http://localhost:3000/api/products/order', {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        }).then(function (response) {
+            if (response.ok) {
+                return response.json();
+            }
+        })
+        const orderId = result.orderId;
+        location.href = `./confirmation.html?order=${orderId}`
+    })
+}
+//display an error message if wrong
 function showError(element, message) {
     let errorElement = element.nextElementSibling
     errorElement.innerText = message;
@@ -235,8 +238,8 @@ function hideError(element) {
 
 //Function who's search in the value of form all the prohibited character and return an alert
 function isFirstNameValid(firstName) {
-    if(firstName.trim(' ').length < 3) {
-        alert('veuillez selectionner au moins trois caractères')
+    if (firstName.trim(' ').length < 3) {
+        alert('Erreur: veuillez vous reporter au formulaire')
         return
     }
     let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
@@ -244,30 +247,30 @@ function isFirstNameValid(firstName) {
 }
 
 function isLasttNameValid(lastName) {
-  if(lastName.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères')
-    return
-}
-let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
-  return pattern.test(lastName)
+    if (lastName.trim(' ').length < 3) {
+        alert('Erreur: veuillez vous reporter au formulaire')
+        return
+    }
+    let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
+    return pattern.test(lastName)
 }
 
 function isAddressValid(address) {
-  if(address.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères')
-    return
-}
-  let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
-  return pattern.test(address)
+    if (address.trim(' ').length < 3) {
+        alert('Erreur: veuillez vous reporter au formulaire')
+        return
+    }
+    let pattern = /^[_A-zÀ-ÿ0-9]*((-|\s)*[_A-zÀ-ÿ0-9])*$/;
+    return pattern.test(address)
 }
 
 function isCityValid(city) {
-  if(city.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères')
-    return
-}
-let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
-  return pattern.test(city)
+    if (city.trim(' ').length < 3) {
+        alert('Erreur: veuillez vous reporter au formulaire')
+        return
+    }
+    let pattern = /^[_A-zÀ-ÿ]*((-|\s)*[_A-zÀ-ÿ])*$/;
+    return pattern.test(city)
 }
 
 function isEmailValid(email) {
@@ -275,8 +278,25 @@ function isEmailValid(email) {
     return pattern.test(email)
 }
 
+function arrayIsEmpty() {
+    //Hidde formulary
+    const hiddenDiv = document.getElementsByClassName('cart__order__form').item(0)
+    hiddenDiv.hidden = true;
+    const totalIsEmpty = document.getElementsByClassName("cart__price").item(0)
+    totalIsEmpty.hidden = true;
+
+    //create a text who's say "the basket is empty"
+    const getSection = document.getElementById('cart__items');
+    const basketIsEmpty = document.createElement('div');
+
+    basketIsEmpty.classList.add("cart__item")
+    basketIsEmpty.style.fontSize = '2em'
+    basketIsEmpty.innerHTML = 'Votre panier est vide'
+    getSection.appendChild(basketIsEmpty);
+}
+
 //main Function call all the function necessary on the load page
-async function main() {
+async function main(store) {
     loadBasket("cart");
     const allProducts = await getData('http://localhost:3000/api/products')
 
@@ -285,6 +305,12 @@ async function main() {
     listenToDeleteButton(products)
     listenToChangeQuantity(products)
     displayTotalPrice(products)
-    getUserCommand()
+    getUserCommand(store)
+    console.log(store.length)
+    //Check is Local Storage is Empty
+    if (store.length === 0) {
+        arrayIsEmpty()
+        return
+    }
 }
-main()
+main(store)

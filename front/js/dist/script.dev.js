@@ -2,8 +2,7 @@
 
 //Display products on screen -------------------------------------------
 function displayProducts(products) {
-  for (var i = 0; i < products.length; i++) {
-    var productsIndex = products[i];
+  products.forEach(function (productsIndex) {
     var catchId = document.getElementById('items'); //create different elements html
 
     var createLink = document.createElement('a');
@@ -23,7 +22,7 @@ function displayProducts(products) {
     createArticle.appendChild(createImg);
     createArticle.appendChild(createName);
     createArticle.appendChild(createDescription);
-  }
+  });
 } //Return API-----------------------------------------------------
 
 

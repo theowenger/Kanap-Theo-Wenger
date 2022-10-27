@@ -28,7 +28,7 @@ var displayBasket = function displayBasket(products) {
             var createPPrice = document.createElement('p');
             createH2.innerHTML = element.name;
             createPColor.innerHTML = element.color;
-            createPPrice.innerHTML = element.price + ",00 €";
+            createPPrice.innerHTML = money(element.price);
             createImg.src = element.imageUrl;
             var createDivItemSetting = document.createElement('div');
             createDivItemSetting.classList.add('cart__item__content__settings');
@@ -99,22 +99,21 @@ function buildCompleteList(productsStore, productsApi) {
 function displayTotalPrice(list) {
   var totalPrice = 0;
   var totalQuantity = 0;
-
-  for (var i = 0; i < list.length; i++) {
-    var price = list[i].price;
-    var quantity = list[i].quantity;
+  list.forEach(function (element) {
+    var price = element.price;
+    var quantity = element.quantity;
     totalPrice += price * quantity;
     totalQuantity += quantity;
-    getTotalPrice.innerHTML = totalPrice;
+    getTotalPrice.innerHTML = money(totalPrice);
     getTotalQuantity.innerHTML = totalQuantity;
-  }
+  });
 } //listen the delete Button and delete the product of DOM
 
 
 function listenToDeleteButton(products) {
   var deleteButton = document.querySelectorAll('.deleteItem');
 
-  var _loop = function _loop(i) {
+  for (var i = 0; i < products.length; i++) {
     deleteButton[i].addEventListener('click', function (e) {
       var article = e.target.closest('article');
       var color = article.getAttribute('color');
@@ -127,16 +126,12 @@ function listenToDeleteButton(products) {
       var updateStore = store.filter(function (p) {
         return p._id !== id || p.color !== color;
       });
-      save('cart', updateStore);
-      getTotalPrice.innerHTML -= products[i].quantity * products[i].price;
-      getTotalQuantity.innerHTML -= products[i].quantity;
-      article.remove();
+      save('cart', updateStore); // getTotalPrice.innerHTML -= products[i].quantity * products[i].price
+      // getTotalQuantity.innerHTML -= products[i].quantity
+      // article.remove();
+
       window.location.reload();
     });
-  };
-
-  for (var i = 0; i < products.length; i++) {
-    _loop(i);
   }
 } //Listen the input quantity and modify in DOM and in LocalStorage
 
@@ -144,7 +139,7 @@ function listenToDeleteButton(products) {
 function listenToChangeQuantity(products) {
   var itemsQuantity = document.querySelectorAll('.itemQuantity');
 
-  var _loop2 = function _loop2(i) {
+  var _loop = function _loop(i) {
     itemsQuantity[i].addEventListener('change', function (e) {
       if (e.target.value > 100 || e.target.value < 1) {
         alert('Veuillez selectionner entre 1 et 100 articles');
@@ -164,12 +159,12 @@ function listenToChangeQuantity(products) {
   };
 
   for (var i = 0; i < itemsQuantity.length; i++) {
-    _loop2(i);
+    _loop(i);
   }
 } //Listen all the form value and send to the confirmation page in a new array named Payload
 
 
-function getUserCommand() {
+function getUserCommand(store) {
   var firstNameInput = document.getElementById('firstName');
   var lastNameInput = document.getElementById('lastName');
   var addressInput = document.getElementById('address');
@@ -233,6 +228,15 @@ function getUserCommand() {
             return _context2.abrupt("return");
 
           case 21:
+            if (!(store.length === 0)) {
+              _context2.next = 24;
+              break;
+            }
+
+            alert('Votre panier est vide');
+            return _context2.abrupt("return");
+
+          case 24:
             payload = {
               contact: {
                 firstName: firstNameInput.value,
@@ -245,7 +249,7 @@ function getUserCommand() {
                 return a._id;
               })
             };
-            _context2.next = 24;
+            _context2.next = 27;
             return regeneratorRuntime.awrap(fetch('http://localhost:3000/api/products/order', {
               method: "POST",
               headers: {
@@ -259,12 +263,12 @@ function getUserCommand() {
               }
             }));
 
-          case 24:
+          case 27:
             result = _context2.sent;
             orderId = result.orderId;
             location.href = "./confirmation.html?order=".concat(orderId);
 
-          case 27:
+          case 30:
           case "end":
             return _context2.stop();
         }
@@ -287,7 +291,7 @@ function hideError(element) {
 
 function isFirstNameValid(firstName) {
   if (firstName.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères');
+    alert('Erreur: veuillez vous reporter au formulaire');
     return;
   }
 
@@ -297,7 +301,7 @@ function isFirstNameValid(firstName) {
 
 function isLasttNameValid(lastName) {
   if (lastName.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères');
+    alert('Erreur: veuillez vous reporter au formulaire');
     return;
   }
 
@@ -307,7 +311,7 @@ function isLasttNameValid(lastName) {
 
 function isAddressValid(address) {
   if (address.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères');
+    alert('Erreur: veuillez vous reporter au formulaire');
     return;
   }
 
@@ -317,7 +321,7 @@ function isAddressValid(address) {
 
 function isCityValid(city) {
   if (city.trim(' ').length < 3) {
-    alert('veuillez selectionner au moins trois caractères');
+    alert('Erreur: veuillez vous reporter au formulaire');
     return;
   }
 
@@ -328,10 +332,25 @@ function isCityValid(city) {
 function isEmailValid(email) {
   var pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
   return pattern.test(email);
+}
+
+function arrayIsEmpty() {
+  //Hidde formulary
+  var hiddenDiv = document.getElementsByClassName('cart__order__form').item(0);
+  hiddenDiv.hidden = true;
+  var totalIsEmpty = document.getElementsByClassName("cart__price").item(0);
+  totalIsEmpty.hidden = true; //create a text who's say "the basket is empty"
+
+  var getSection = document.getElementById('cart__items');
+  var basketIsEmpty = document.createElement('div');
+  basketIsEmpty.classList.add("cart__item");
+  basketIsEmpty.style.fontSize = '2em';
+  basketIsEmpty.innerHTML = 'Votre panier est vide';
+  getSection.appendChild(basketIsEmpty);
 } //main Function call all the function necessary on the load page
 
 
-function main() {
+function main(store) {
   var allProducts, products;
   return regeneratorRuntime.async(function main$(_context3) {
     while (1) {
@@ -348,9 +367,18 @@ function main() {
           listenToDeleteButton(products);
           listenToChangeQuantity(products);
           displayTotalPrice(products);
-          getUserCommand();
+          getUserCommand(store);
+          console.log(store.length); //Check is Local Storage is Empty
 
-        case 10:
+          if (!(store.length === 0)) {
+            _context3.next = 14;
+            break;
+          }
+
+          arrayIsEmpty();
+          return _context3.abrupt("return");
+
+        case 14:
         case "end":
           return _context3.stop();
       }
@@ -358,4 +386,4 @@ function main() {
   });
 }
 
-main();
+main(store);

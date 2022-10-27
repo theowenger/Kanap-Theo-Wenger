@@ -6,7 +6,7 @@ async function getData(url) {
                 return response.json();
             }
 
-            throw "Ce produit n'existe pas, vous serez rediriger vers la page d'acceuil";
+            throw "Ce produit n'existe pas, vous serez redirigé vers la page d'accueil";
         })
         .catch(function (error) {
             alert(error);
@@ -25,4 +25,13 @@ function loadBasket(key) {
     } else {
         return JSON.parse(store);
     }
+}
+
+//change price into euro
+function money(amount) {
+    const formater = new Intl.NumberFormat('fr-FR', {
+        style: 'currency',
+        currency: 'EUR'
+    });
+    return formater.format(amount)
 }

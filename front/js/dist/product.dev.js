@@ -14,7 +14,7 @@ var getQuantityOfProduct = document.getElementById('quantity'); //Put Element of
 
 function displayProductsOnPage(products) {
   getNameOfProduct.innerHTML = products.name;
-  getPriceOfProduct.innerHTML = products.price;
+  getPriceOfProduct.innerHTML = money(products.price);
   getDescriptionOfProduct.innerHTML = products.description;
 } //Create IMG---------------------------------------------------------------------
 

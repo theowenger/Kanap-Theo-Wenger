@@ -2,9 +2,7 @@
 
 //Display products on screen -------------------------------------------
 function displayProducts(products) {
-    for (let i = 0; i < products.length; i++) {
-        const productsIndex = products[i];
-
+    products.forEach(productsIndex => {
         const catchId = document.getElementById('items');
 
         //create different elements html
@@ -32,7 +30,7 @@ function displayProducts(products) {
         createArticle.appendChild(createImg);
         createArticle.appendChild(createName);
         createArticle.appendChild(createDescription);
-    }
+    });
 }
 
 

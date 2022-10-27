@@ -16,7 +16,7 @@ const getQuantityOfProduct = document.getElementById('quantity');
 //Put Element of products in each ID or Class of the product.html page
 function displayProductsOnPage(products) {
     getNameOfProduct.innerHTML = products.name;
-    getPriceOfProduct.innerHTML = products.price;
+    getPriceOfProduct.innerHTML = money(products.price);
     getDescriptionOfProduct.innerHTML = products.description;
 }
 
@@ -68,9 +68,9 @@ function addToBasket(productCommand) {
     //trier le tableau et regroupe les elements par ID
     arrayBasket.sort(function compare(a, b) {
         if (a._id < b._id)
-           return -1;
-        if (a._id > b._id )
-           return 1;
+            return -1;
+        if (a._id > b._id)
+            return 1;
         return 0;
     });
     save('cart', arrayBasket);
@@ -81,7 +81,7 @@ function addToBasket(productCommand) {
 
 const buttonBasket = document.getElementById('addToCart')
 
-buttonBasket.addEventListener('click',  async function () {
+buttonBasket.addEventListener('click', async function () {
     const products = await getData('http://localhost:3000/api/products/' + currentIdOnPage)
 
     const productCommand = {
@@ -89,16 +89,16 @@ buttonBasket.addEventListener('click',  async function () {
         color: getColorsContainerOfProduct.options[getColorsContainerOfProduct.selectedIndex].value,
         quantity: parseInt(getQuantityOfProduct.value),
     }
-    if(productCommand.color === "") {
+    if (productCommand.color === "") {
         alert('veuillez choisir une couleur');
         return
     }
-    if(productCommand.quantity < 1 || productCommand.quantity > 99) {
+    if (productCommand.quantity < 1 || productCommand.quantity > 99) {
         alert('veuillez choisir une quantitée entre 1 et 99');
         return
     }
     for (const i in products.colors) {
-        if(productCommand.color === products.colors[i]) {
+        if (productCommand.color === products.colors[i]) {
             addToBasket(productCommand)
             alert('votre produit est ajouté au panier')
             return
