@@ -5,3 +5,8 @@ const commandNumber = searchParams.get('order');
 
 //insert the order in DOM
 const spanCommandNumber = document.getElementById('orderId').innerHTML = commandNumber
+
+function deleteLocalStorage() {
+    localStorage.clear()
+}
+deleteLocalStorage()
